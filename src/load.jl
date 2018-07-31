@@ -22,7 +22,7 @@ General type for storing an LP problem which contains the following fields:
 
 """
 
-type LPproblem
+mutable struct LPproblem
     S       ::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix}
     b       ::Array{Float64,1}
     c       ::Array{Float64,1}
@@ -115,7 +115,7 @@ function loadModel(fileName::String, matrixAS::String="S", modelName::String="mo
             osense = model[modelFields[3]]
         else
             osense = -1
-            info("The model objective is set to be maximized.\n")
+            @info("The model objective is set to be maximized.\n")
         end
 
         # load the upper bound vector c
@@ -140,7 +140,7 @@ function loadModel(fileName::String, matrixAS::String="S", modelName::String="mo
                 csense[i] = model[modelFields[6]][i][1] #convert to chars
             end
         else
-            info("All constraints assumed equality constaints.\n")
+            @info("All constraints assumed equality constaints.\n")
         end
 
         # load the reaction names vector

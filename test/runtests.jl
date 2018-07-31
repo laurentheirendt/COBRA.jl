@@ -24,7 +24,7 @@ end
 
 # use the module COBRA and Base.Test modules on all workers
 using COBRA
-using Base.Test
+using Test
 using Requests
 
 # download the ecoli_core_model
@@ -51,13 +51,13 @@ for s = 1:length(packages)
     testDir = readdir(".")
 
     # print the solver name
-    print_with_color(:green, "\n\n -- Running $(length(testDir) - 2) tests using the $solverName solver. -- \n\n")
+    printstyled("\n\n -- Running $(length(testDir) - 2) tests using the $solverName solver. -- \n\n", color=:green)
 
     # evaluate the test file
     for t = 1:length(testDir)
         # run only parallel and serial test files
         if testDir[t][1:2] == "p_" || testDir[t][1:2] == "s_" || testDir[t][1:2] == "z_"
-            print_with_color(:green, "\nRunning $(testDir[t]) ...\n\n")
+            printstyled("\nRunning $(testDir[t]) ...\n\n", color=:green)
             include(testDir[t])
         end
     end
@@ -70,6 +70,6 @@ if isdir(tmpDir)
 end
 
 # print a status line
-print_with_color(:green, "\n -- All tests passed. -- \n\n")
+printstyled("\n -- All tests passed. -- \n\n", color=:green)
 
 #-------------------------------------------------------------------------------------------

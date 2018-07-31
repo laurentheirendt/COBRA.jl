@@ -52,7 +52,7 @@ function createPool(localWorkers::Int, connectSSH::Bool=false, connectionFile::S
         if isfile(connectionFile)
             print("Loading SSH connection details from $connectionFile ...")
             include(connectionFile)
-            print_with_color(:green, "Done.\n")
+            printstyled("Done.\n", color=:green)
         else
             error("Connection file (filename: `$connectionFile`) is unreadable or not accessible.")
         end
@@ -73,32 +73,32 @@ function createPool(localWorkers::Int, connectSSH::Bool=false, connectionFile::S
 
     # connect all required workers
     if nWorkers <= 1
-        info("Sequential version - Depending on the model size, expect long execution times.")
+        @info("Sequential version - Depending on the model size, expect long execution times.")
 
     else
         info("Parallel version - Connecting the $nWorkers workers ...")
 
         # print a warning for already connected threads
         if nprocs() > nWorkers
-            print_with_color(:blue, "$nWorkers workers already connected. No further workers to connect.\n")
+            printstyled("$nWorkers workers already connected. No further workers to connect.\n", color=:blue)
         end
 
         # add local threads
         if localWorkers > 0 && nworkers() < nWorkers
             addprocs(localWorkers, topology = :master_slave)
-            print_with_color(:blue, "$(nworkers()) local workers are connected. (+1) on host: $(gethostname())\n")
+            printstyled("$(nworkers()) local workers are connected. (+1) on host: $(gethostname())\n", color=:blue)
         end
 
         # add remote threads
         if connectSSH && nworkers() < nWorkers && isfile(connectionFile)
-            info("Connecting SSH nodes ...")
+            @info("Connecting SSH nodes ...")
 
             # loop through the workers to be connected
             for i = 1:length(sshWorkers)
                 println(" >> Connecting ", sshWorkers[i]["procs"], " workers on ", sshWorkers[i]["usernode"])
 
                 try
-                    if !is_windows()
+                    if !Sys.iswindows()
                         # try logging in quietly to defined node using SSH
                         successConnect = success(`ssh -T -o BatchMode=yes -o ConnectTimeout=1 $(sshWorkers[i]["usernode"]) $(sshWorkers[i]["flags"])`)
 

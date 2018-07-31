@@ -61,7 +61,7 @@ function preFBA!(model, solver, optPercentage::Float64=0.0, osenseStr::String="m
 
     # provide a warning when the optPercentage is higher than 90%
     if optPercentage > OPT_PERCENTAGE
-        print_with_color(:cyan, "The value of optPercentage is higher than 90%. The solution process might take longer than expected.\n\n")
+        printstyled("The value of optPercentage is higher than 90%. The solution process might take longer than expected.\n\n", color=:cyan)
     end
 
     # determine constraints for the correct space (0-100% of the full space)
@@ -93,7 +93,7 @@ function preFBA!(model, solver, optPercentage::Float64=0.0, osenseStr::String="m
 
     # add a condition if the LP has an extra condition based on the FBA solution
     if hasObjective
-        print_with_color(:blue, "preFBA! [osenseStr = $osenseStr]: FBAobj = $FBAobj, optPercentage = $optPercentage, objValue = optPercentage * FBAobj = $objValue, norm(fbaSol) = $(norm(fbaSol)).\n\n")
+        printstyled("preFBA! [osenseStr = $osenseStr]: FBAobj = $FBAobj, optPercentage = $optPercentage, objValue = optPercentage * FBAobj = $objValue, norm(fbaSol) = $(norm(fbaSol)).\n\n", color=:blue)
 
         # add a row in the stoichiometric matrix
         model.S = [model.S; model.c']
@@ -110,7 +110,7 @@ function preFBA!(model, solver, optPercentage::Float64=0.0, osenseStr::String="m
 
         return FBAobj, fbaSol
     else
-        print_with_color(:blue, "No objective set (`c` is zero). objValue and fbaSol not defined. optPercentage = $optPercentage.\n\n")
+        printstyled("No objective set (`c` is zero). objValue and fbaSol not defined. optPercentage = $optPercentage.\n\n", color=:blue)
         return nothing
     end
 
@@ -166,8 +166,8 @@ function splitRange(model, rxnsList, nWorkers::Int=1, strategy::Int=0)
     NrxnsList = length(rxnsList)
 
     # output the average load per worker and the splitting strategy
-    print_with_color(:blue, "Average load per worker: $pRxnsWorker reactions ($nWorkers workers).\n")
-    print_with_color(:blue, "Splitting strategy is $strategy.\n\n")
+    printstyled("Average load per worker: $pRxnsWorker reactions ($nWorkers workers).\n", color=:blue)
+    printstyled("Splitting strategy is $strategy.\n\n", color=:blue)
 
     # define indices for each worker p
     istart      = zeros(Int, nWorkers)
@@ -520,17 +520,17 @@ function distributedFBA(model, solver; nWorkers::Int=1, optPercentage::Union{Flo
         startTime = time()
         optSol, fbaSol = preFBA!(model, solver, optPercentage, objective)
         solTime = time() - startTime
-        print_with_color(:green, "Original FBA solved. Solution time: $solTime s.\n\n")
+        printstyled("Original FBA solved. Solution time: $solTime s.\n\n", color=:green)
     else
         # throw a warning message if preFBA = false and optPercentage > 0%
         if optPercentage > 0.0
-            warn("The value of optPercentage is > 0%, but preFBA = false. Set preFBA = true in order to take optPercentage into account.\n\n")
+            @warn("The value of optPercentage is > 0%, but preFBA = false. Set preFBA = true in order to take optPercentage into account.\n\n")
         end
 
         # define the optSol and fbaSol variables
         optSol = NaN
         fbaSol = NaN * zeros(length(model.rxns))
-        print_with_color(:blue, "Original FBA. No additional constraints have been added.\n")
+        printstyled("Original FBA. No additional constraints have been added.\n", color=:blue)
     end
 
     # determine the number of reactions and metabolites
@@ -553,23 +553,23 @@ function distributedFBA(model, solver; nWorkers::Int=1, optPercentage::Union{Flo
     # set saveChunks to false when only the maxFlux and minFlux arguments are requested
     if saveChunks && onlyFluxes
         saveChunks = false;
-        warn("`saveChunks` has been set to `false`.\n")
+        @warn("`saveChunks` has been set to `false`.\n")
     end
 
     if saveChunks || logFiles
         # create a folder for storing the results
         if !isdir("$resultsDir")
             mkdir("$resultsDir")
-            print_with_color(:green, "Directory `$resultsDir` created.\n")
+            printstyled("Directory `$resultsDir` created.\n", color=:green)
         else
-            print_with_color(:cyan, "Directory `$resultsDir` already exists.\n")
+            printstyled("Directory `$resultsDir` already exists.\n", color=:cyan)
         end
     end
 
     # create a folder for log files
     if logFiles && !isdir("$resultsDir/logs")
         mkdir("$resultsDir/logs")
-        print_with_color(:green, "Directory `$resultsDir/logs` created.\n")
+        printstyled("Directory `$resultsDir/logs` created.\n", color=:green)
     end
 
     # initialize the flux matrices
@@ -591,7 +591,7 @@ function distributedFBA(model, solver; nWorkers::Int=1, optPercentage::Union{Flo
     else
         fvamin = NaN * zeros(1, 1)
         fvamax = NaN * zeros(1, 1)
-        info("Only the `minFlux` and `maxFlux` vectors will be calculated (solver solution status available in `statussolmin` and `statussolmax`).\n")
+        @info("Only the `minFlux` and `maxFlux` vectors will be calculated (solver solution status available in `statussolmin` and `statussolmax`).\n")
     end
 
     # initialize the vectors to report the solution status
@@ -601,7 +601,7 @@ function distributedFBA(model, solver; nWorkers::Int=1, optPercentage::Union{Flo
     # perform sanity checks
     if nRxnsList > nRxns
         rxnsList = 1:nRxns
-        warn("The `rxnsList` has more reactions than in the model. `rxnsList` shorted to the maximum number of reactions.")
+        @warn("The `rxnsList` has more reactions than in the model. `rxnsList` shorted to the maximum number of reactions.")
     end
 
     if nRxns != nRxnsList
@@ -612,14 +612,14 @@ function distributedFBA(model, solver; nWorkers::Int=1, optPercentage::Union{Flo
 
     # sanity checks for large models
     if nRxnsList > 20000 && nWorkers <= 4
-        warn("\nTrying to solve more than 20000 optimization problems on fewer than 4 workers. Memory might be limited.")
-        info(" >> Try running this analysis on a cluster, or use a larger parallel pool.\n")
+        @warn("\nTrying to solve more than 20000 optimization problems on fewer than 4 workers. Memory might be limited.")
+        @info(" >> Try running this analysis on a cluster, or use a larger parallel pool.\n")
     end
 
     # sanity check for few reactions on a large pool
     if nRxnsList < nWorkers
-        warn("\nThe parallel pool of workers is larger than the number of reactions being solved.")
-        info(" >> Consider reducing the size of the parallel pool to free system resources.\n")
+        @warn("\nThe parallel pool of workers is larger than the number of reactions being solved.")
+        @info(" >> Consider reducing the size of the parallel pool to free system resources.\n")
     end
 
     # perform maximizations and minimizations in parallel
@@ -740,7 +740,7 @@ function printSolSummary(testFile::String, optSol, maxFlux, minFlux, solTime, nW
 
     # print a solution summary
     println("\n-- Solution summary --\n")
-    print_with_color(:blue, "$testFile\n")
+    printstyled("$testFile\n", color=:blue)
 
     if !isnan(optSol)  println(" Original FBA obj.val         ", optSol)  end
 
@@ -829,7 +829,7 @@ function saveDistributedFBA(fileName::String, vars::Array{String,1} = ["minFlux"
             # increment the counter
             countSavedVars = countSavedVars + 1
 
-            print_with_color(:green, "Done.\n")
+            printstyled("Done.\n", color=:green)
         end
     end
 
@@ -838,9 +838,9 @@ function saveDistributedFBA(fileName::String, vars::Array{String,1} = ["minFlux"
 
     # print a status message
     if countSavedVars > 0
-        print_with_color(:green, "All available variables saved to $fileName.\n")
+        printstyled("All available variables saved to $fileName.\n", color=:green)
     else
-        warn("No variables saved.")
+        @warn("No variables saved.")
     end
 
 end

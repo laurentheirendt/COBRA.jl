@@ -7,7 +7,7 @@
 
 #-------------------------------------------------------------------------------------------
 
-using Base.Test
+using Test
 
 if !@isdefined includeCOBRA
     includeCOBRA = true
@@ -323,7 +323,7 @@ run(`rm -rf $(Pkg.dir("COBRA"))/results`)
 # create folders if they are not present
 if !isdir("$(Pkg.dir("COBRA"))/results")
     mkdir("$(Pkg.dir("COBRA"))/results")
-    print_with_color(:green, "Directory `results` created.\n\n")
+    printstyled("Directory `results` created.\n\n", color=:green)
 
     # create a folder for storing the chunks of the fluxes of each minimization
     if !isdir("$(Pkg.dir("COBRA"))/results/fvamin")
@@ -335,7 +335,7 @@ if !isdir("$(Pkg.dir("COBRA"))/results")
         mkdir("$(Pkg.dir("COBRA"))/results/fvamax")
     end
 else
-    print_with_color(:cyan, "Directory `results` already exists.\n\n")
+    printstyled("Directory `results` already exists.\n\n", color=:cyan)
 end
 
 minFlux, maxFlux, optSol, fbaSol, fvamin, fvamax, statussolmin, statussolmax = distributedFBA(model, solver, preFBA=true, saveChunks=true)
@@ -376,7 +376,7 @@ resultsDir = "$(Pkg.dir("COBRA"))/results"
 
 if isdir("$resultsDir/logs")
     rm("$resultsDir/logs")
-    print_with_color(:green, "$resultsDir/logs folder created")
+    printstyled("$resultsDir/logs folder created", color=:green)
 end
 
 # call to create a log files directory

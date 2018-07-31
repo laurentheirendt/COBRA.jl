@@ -7,7 +7,7 @@
 
 #-------------------------------------------------------------------------------------------
 
-sshWorkers = Array{Dict{Any, Any}}(3)
+sshWorkers = Array{Dict{Any, Any}}(undef, 3)
 
 sshWorkers[1,:] = Dict( "usernode"   => "first.last@server1.com",
                         "procs"  => 8,

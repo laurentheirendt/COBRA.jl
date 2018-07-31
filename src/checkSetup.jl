@@ -36,8 +36,8 @@ function checkPackage(pkgName, verbose = 1)
         return true
     catch
         if verbose == 1
-            print_with_color(:yellow, "Package ",string(pkgName), " is not installed. ",
-                             "In order to use $pkgName, you must first run `Pkg.add(\"$pkgName\")`\n")
+            printstyled("Package ",string(pkgName), " is not installed. ",
+                             "In order to use $pkgName, you must first run `Pkg.add(\"$pkgName\")`\n", color=:yellow)
         end
         return false
     end
@@ -68,7 +68,7 @@ See also: `MathProgBase`, `checkPackage()`
 function checkSysConfig(verbose = 1)
 
     if verbose == 1
-        print_with_color(:yellow, "\n >> Checking the system's configuration ...\n\n")
+        printstyled("\n >> Checking the system's configuration ...\n\n", color=:yellow)
     end
 
     #initialize a vector for storing the packages
@@ -85,7 +85,7 @@ function checkSysConfig(verbose = 1)
 
             if checkPackage(pkgName, verbose)
                 if verbose == 1
-                    print_with_color(:green, string(pkgName), " is installed.\n")
+                    printstyled(string(pkgName), " is installed.\n", color=:green)
                 end
                 push!(packages, pkgName)
             end
@@ -105,7 +105,7 @@ function checkSysConfig(verbose = 1)
     # print a success message if the solver is installed
     catch
         if verbose == 1
-            print_with_color(:green, "\n >> Done. $(length(packages)) solvers are installed and ready to use.\n")
+            printstyled("\n >> Done. $(length(packages)) solvers are installed and ready to use.\n", color=:green)
         end
 
         return packages

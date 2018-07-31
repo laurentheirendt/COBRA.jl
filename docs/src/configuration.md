@@ -56,7 +56,7 @@ which will connect 12 local workers, and all workers defined in `mySSHCfg.jl`. A
 
 An array with all connection details to SSH nodes is defined as follows:
 ```julia
-sshWorkers = Array{Dict{Any, Any}}(1)
+sshWorkers = Array{Dict{Any, Any}}(undef, 1)
 
 sshWorkers[1,:] = Dict( "usernode"   => "first.last@server.com",
                         "procs"  => 32,

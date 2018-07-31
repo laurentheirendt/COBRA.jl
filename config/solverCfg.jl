@@ -55,5 +55,5 @@ elseif solverName == "Mosek"
 
 else
     solParams = [] #end of solParams
-    warn("The solver is not supported. No solver parameters have been set.")
+    @warn("The solver is not supported. No solver parameters have been set.")
 end
