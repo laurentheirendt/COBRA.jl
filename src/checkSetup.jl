@@ -26,9 +26,7 @@ Function checks whether a package is installed properly or not and returns a boo
 See also: `using`, `isdir()`
 
 """
-
 function checkPackage(pkgName, printLevel::Int=1)
-
     try
         eval(Expr(:using, pkgName))
         return true
@@ -60,13 +58,10 @@ returns a list of these packages. `MathProgBase.jl` must be installed.
 See also: `MathProgBase`, `checkPackage()`
 
 """
-
 function checkSysConfig(printLevel::Int=1)
-
     if printLevel > 0
         print_with_color(:yellow, "\n >> Checking the system's configuration ...\n\n")
     end
-
     #initialize a vector for storing the packages
     packages = []
 
