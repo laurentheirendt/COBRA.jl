@@ -12,7 +12,8 @@ if "JENKINS" in keys(ENV)
     include("$JULIA_HOME/../share/julia/test/testenv.jl")
     addprocsCOBRA = addprocs_with_testenv
 else
-    addprocsCOBRA = addprocs
+    import Distributed
+    addprocsCOBRA = Distributed.addprocs
 end
 
 """
@@ -53,7 +54,6 @@ which will connect 12 local workers, and all workers defined in `mySSHCfg.jl`. A
 See also: `workers()`, `nprocs()`, `addprocs()`, `gethostname()`
 
 """
-
 function createPool(localWorkers::Int, connectSSH::Bool=false, connectionFile::String="$(Pkg.dir("COBRA"))/config/sshCfg.jl", printLevel::Int=1)
 
     # load cores on remote nodes
