@@ -6,6 +6,8 @@
 =#
 
 #-------------------------------------------------------------------------------------------
+using SparseArrays
+
 """
     LPproblem(S, b, c, lb, ub, osense, csense, rxns, mets)
 
@@ -21,7 +23,6 @@ General type for storing an LP problem which contains the following fields:
 - `solver`:         A `::SolverConfig` object that contains a valid `handle` to the solver
 
 """
-
 mutable struct LPproblem
     S       ::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix}
     b       ::Array{Float64,1}
@@ -74,14 +75,12 @@ julia> model = loadModel("myModel.mat", "A", "myModelName", ["ub","lb","osense",
 
 See also: `MAT.jl`, `matopen()`, `matread()`
 """
-
 function loadModel(fileName::String, matrixAS::String="S", modelName::String="model", modelFields::Array{String,1}=["ub", "lb", "osense", "c", "b", "csense", "rxns", "mets"], printLevel::Int=1)
 
     file = matopen(fileName)
     vars = matread(fileName)
 
     if exists(file, modelName)
-
         model     = vars[modelName]
         modelKeys = keys(model)
 
